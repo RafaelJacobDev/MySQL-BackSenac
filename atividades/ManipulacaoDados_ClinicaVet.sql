@@ -103,3 +103,17 @@ em ordem decrescente por nome*/
 SELECT * FROM cliente
 WHERE (estado='SP') AND (tipoLogadouro='Avenida')
 ORDER BY nomeCliente DESC 
+
+/*9 Listar nome e cidade de todos os clientes que começam com a letra R, ordenando 
+por nome em ordem alfabética*/
+ 
+/*10 Listar o nome, email e cpf de todos os clientes que possuem email da uol e que morem 
+no estado de sp */
+
+SELECT idCliente, nomeCliente, cidade FROM cliente
+WHERE nomeCliente LIKE 'R%'
+ORDER BY nomeCliente
+
+SELECT idCliente, nomeCliente, email, cpf, estado FROM cliente
+WHERE email LIKE ('%@email.%') AND estado IN ('SP')
+ORDER BY nomeCliente
