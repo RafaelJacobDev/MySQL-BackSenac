@@ -135,3 +135,175 @@ WHERE idCliente = 71;
 
 SELECT * FROM cliente
 ORDER BY idCliente 
+
+DESCRIBE aluguel
+DELETE FROM Funcionario
+WHERE nomeFuncionario = 'Chico Bento'AND idFuncionario <> 3;
+
+/*
+6)Inserir o aluguel de 1 cadeiras 2 posições para o Pateta feita pelo Cebolinha, em 08/12/24. Fazer o update da quantidade retirando uma do estoque. */
+
+INSERT INTO Aluguel (idCliente,idFuncionario,dataHoraRetirada,dataHoraDevolucao,valorAPagar,pago,formaPagamento,qtVezes)
+VALUES ((SELECT idCliente FROM Cliente WHERE nomeCliente = 'Pateta'),(SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Cebolinha'),'2024-12-08 09:00:00',NULL,NULL,0,NULL,NULL);
+
+
+DESCRIBE aluguelequipamento
+SELECT * FROM equipamento
+DELETE FROM equipamento
+WHERE nomeEquipamento = 'Mesinha'AND idEquipamento <> 5;
+
+INSERT INTO AluguelEquipamento (idAluguel,idEquipamento,valorUnitario,valorItem,quantidade)
+VALUES ((SELECT idAluguel FROM Aluguel WHERE idCliente = (SELECT idCliente FROM Cliente WHERE nomeCliente = 'Pateta')ORDER BY idAluguel DESC LIMIT 1),(SELECT idEquipamento FROM Equipamento WHERE nomeEquipamento = 'Cadeira 02 posições'),(SELECT valorHora FROM Equipamento WHERE nomeEquipamento = 'Cadeira 02 posições'),(SELECT valorHora FROM Equipamento WHERE nomeEquipamento = 'Cadeira 02 posições') * 1,1);
+
+UPDATE Equipamento
+SET qtd = qtd - 1
+WHERE nomeEquipamento = 'Cadeira 02 posições';
+
+/*7)Inserir o aluguel de 2 cadeiras 4 posições e um guarda sol G para o Mickey feita pelo Chico Bento, em dez 10/12/24.
+Fazer o update da quantidade retirando do estoque. */
+
+INSERT INTO Aluguel (idCliente,idFuncionario,dataHoraRetirada,dataHoraDevolucao,valorAPagar,pago,formaPagamento,qtVezes)
+VALUES ((SELECT idCliente FROM Cliente WHERE nomeCliente = 'Mickey'),(SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'),'2024-12-10 09:00:00',NULL,NULL,0,NULL,NULL);
+
+-- Cadeiras 4 posições (2 unidades)
+INSERT INTO AluguelEquipamento (idAluguel,idEquipamento,valorUnitario,valorItem,quantidade)
+VALUES ((SELECT idAluguel FROM Aluguel WHERE idCliente = (SELECT idCliente FROM Cliente WHERE nomeCliente = 'Mickey')ORDER BY idAluguel DESC LIMIT 1),(SELECT idEquipamento FROM Equipamento WHERE nomeEquipamento = 'Cadeira 04 posições'),(SELECT valorHora FROM Equipamento WHERE nomeEquipamento = 'Cadeira 04 posições'),(SELECT valorHora FROM Equipamento WHERE nomeEquipamento = 'Cadeira 04 posições') * 2,2);
+
+-- Guarda-sol G (1 unidade)
+INSERT INTO AluguelEquipamento (idAluguel,idEquipamento,valorUnitario,valorItem,quantidade)
+VALUES ((SELECT idAluguel FROM Aluguel WHERE idCliente = (SELECT idCliente FROM Cliente WHERE nomeCliente = 'Mickey')ORDER BY idAluguel DESC LIMIT 1),(SELECT idEquipamento FROM Equipamento WHERE nomeEquipamento = 'Guarda Sol G'),(SELECT valorHora FROM Equipamento WHERE nomeEquipamento = 'Guarda Sol G'),(SELECT valorHora FROM Equipamento WHERE nomeEquipamento = 'Guarda Sol G') * 1,1);
+
+UPDATE Equipamento
+SET qtd = qtd - 2
+WHERE nomeEquipamento = 'Cadeira 04 posições';
+
+UPDATE Equipamento
+SET qtd = qtd - 1
+WHERE nomeEquipamento = 'Guarda sol G';
+
+/*8)Inserir o aluguel de 1 guarda sol P para 3 pessoas quaisquer feita pelo Cebolinha, em 27/12/24.
+Fazer o update da quantidade retirando do estoque. */
+
+INSERT INTO Aluguel (idCliente,idFuncionario,dataHoraRetirada,dataHoraDevolucao,valorAPagar,pago,formaPagamento,qtVezes)
+VALUES
+((SELECT idCliente FROM Cliente WHERE nomeCliente = 'Mickey'),(SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Cebolinha'),'2024-12-27 09:00:00',NULL,NULL,0,NULL,NULL),
+((SELECT idCliente FROM Cliente WHERE nomeCliente = 'Capitão Boeing'),(SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Cebolinha'),'2024-12-27 09:00:00',NULL,NULL,0,NULL,NULL),
+((SELECT idCliente FROM Cliente WHERE nomeCliente = 'Huguinho'),(SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Cebolinha'),'2024-12-27 09:00:00',NULL,NULL,0,NULL,NULL);
+
+INSERT INTO AluguelEquipamento 
+(idAluguel, idEquipamento, valorUnitario, valorItem, quantidade)
+VALUES 
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 69 ORDER BY idAluguel DESC LIMIT 1),3,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 3),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 3) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 79 ORDER BY idAluguel DESC LIMIT 1),3,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 3),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 3) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 64 ORDER BY idAluguel DESC LIMIT 1),3,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 3),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 3) * 1,1);
+
+UPDATE Equipamento
+SET qtd = qtd - 3
+WHERE nomeEquipamento = 'Guarda sol P';
+
+/*9)Inserir o aluguel de 2 cadeiras 4 posições e um guarda sol G para 6 pessoas aleatórias feitas pelo Chico Bento, em dez 28/12/24. Fazer o update da quantidade retirando do estoque.*/
+
+INSERT INTO Aluguel (idCliente, idFuncionario, dataHoraRetirada, dataHoraDevolucao, valorAPagar, pago, formaPagamento, qtVezes)
+VALUES
+((SELECT idCliente FROM Cliente WHERE idCliente = 68), (SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'), '2024-12-27 09:00:00', NULL, NULL, 0, NULL, NULL),
+((SELECT idCliente FROM Cliente WHERE idCliente = 70), (SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'), '2024-12-27 09:00:00', NULL, NULL, 0, NULL, NULL),
+((SELECT idCliente FROM Cliente WHERE idCliente = 71), (SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'), '2024-12-27 09:00:00', NULL, NULL, 0, NULL, NULL),
+((SELECT idCliente FROM Cliente WHERE idCliente = 72), (SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'), '2024-12-27 09:00:00', NULL, NULL, 0, NULL, NULL),
+((SELECT idCliente FROM Cliente WHERE idCliente = 73), (SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'), '2024-12-27 09:00:00', NULL, NULL, 0, NULL, NULL),
+((SELECT idCliente FROM Cliente WHERE idCliente = 74), (SELECT idFuncionario FROM Funcionario WHERE nomeFuncionario = 'Chico Bento'), '2024-12-27 09:00:00', NULL, NULL, 0, NULL, NULL);
+
+DELETE FROM AluguelEquipamento
+WHERE idAluguelEquipamento >= 7;
+
+INSERT INTO AluguelEquipamento (idAluguel, idEquipamento, valorUnitario, valorItem, quantidade)
+VALUES 
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 68 ORDER BY idAluguel DESC LIMIT 1),2,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2) * 1,2),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 70 ORDER BY idAluguel DESC LIMIT 1),2,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2) * 1,2),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 71 ORDER BY idAluguel DESC LIMIT 1),2,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2) * 1,2),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 72 ORDER BY idAluguel DESC LIMIT 1),2,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2) * 1,2),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 73 ORDER BY idAluguel DESC LIMIT 1),2,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2) * 1,2),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 74 ORDER BY idAluguel DESC LIMIT 1),2,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 2) * 1,2);
+
+  
+INSERT INTO AluguelEquipamento (idAluguel, idEquipamento, valorUnitario, valorItem, quantidade)
+VALUES 
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 68 ORDER BY idAluguel DESC LIMIT 1),4,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 70 ORDER BY idAluguel DESC LIMIT 1),4,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 71 ORDER BY idAluguel DESC LIMIT 1),4,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 72 ORDER BY idAluguel DESC LIMIT 1),4,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 73 ORDER BY idAluguel DESC LIMIT 1),4,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4) * 1,1),
+((SELECT idAluguel FROM Aluguel WHERE idCliente = 74 ORDER BY idAluguel DESC LIMIT 1),4,(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4),(SELECT valorHora FROM Equipamento WHERE idEquipamento = 4) * 1,1);
+
+UPDATE Equipamento
+SET qtd = qtd - 6
+WHERE nomeEquipamento = 'Guarda sol G';
+
+UPDATE Equipamento
+SET qtd = qtd - 12
+WHERE nomeEquipamento = 'Cadeira 04 posições';
+
+/*10)Listar o nome e os contatos de todos os clientes da barraca em ordem alfabética. */
+
+SELECT nomeCliente, email
+FROM  cliente
+ORDER BY nomeCliente
+
+/*11)Listar o nome e o contato telefônico de todos os funcionários da barraca em ordem alfabética.*/ 
+
+SELECT nomeFuncionario, celular
+FROM funcionario
+ORDER BY nomeFuncionario
+
+/*12)Listar todos os dados dos aluguéis realizados em ordem de data da mais antiga para a mais nova.*/
+
+SELECT * FROM aluguel
+ORDER BY dataHoraRetirada ASC 
+
+/*13)Listar nome, cidade e estado de todos os clientes da baixada santista em ordem alfabética por nome.*/
+
+SELECT nomeCliente, cidade, estado
+FROM cliente 
+WHERE cidade IN ('Santos', 'São Vicente', 'Praia Grande', 'Guarujá', 'Cubatão', 'Bertioga', 'Mongaguá', 'Itanhaém')
+ORDER BY nomeCliente ASC;
+
+/*14)Listar todos os produtos e a quantidade de estoque do produto que tem mais itens para o que tem menos.*/
+
+SELECT nomeEquipamento, qtd FROM equipamento
+ORDER BY  qtd DESC;
+
+/*15)Listar o nome, a cidade e o estado de todos os clientes que moram em casa em ordem alfabética.*/
+
+SELECT nomeCliente,cidade, estado
+FROM Cliente
+WHERE complemento LIKE  '%casa%'
+ORDER BY nomeCliente ASC;
+
+/*16)Listar o nome de todos os clientes e o estado daqueles que não vivem no estado de SP.*/
+
+SELECT nomeCliente, estado
+FROM Cliente
+WHERE estado <> 'SP';
+
+/*17)Listar o nome de todos os clientes que começam com a letra A.*/
+
+SELECT nomeCliente
+FROM cliente
+WHERE nomeCliente LIKE 'A%'
+
+/*18)Listar todos os dados dos clientes que começam com a letra M e vivam no estado de PE.*/
+
+SELECT * FROM cliente 
+WHERE nomeCliente LIKE 'M%' AND estado = 'PE'
+
+/*19)Listar apenas as cadeiras e a quantidade que possui em estoque em ordem de quantidade, da que mais possui itens para a que menos possui. */
+
+SELECT nomeEquipamento,qtd
+FROM equipamento
+WHERE nomeEquipamento LIKE '%Cadeira%' 
+ORDER BY qtd DESC;
+
+/*20)Listar todos os dados dos alugueis que ocorreram entre 25/12 e 31/12 de 2024 em ordem de data da mais antiga para a mais nova. */
+
+SELECT * FROM aluguel 
+WHERE dataHoraRetirada BETWEEN '2024-12-25%' AND '2024-12-31%'
+ORDER BY dataHoraRetirada ASC;
