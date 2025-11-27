@@ -117,3 +117,202 @@ ORDER BY nomeCliente
 SELECT idCliente, nomeCliente, email, cpf, estado FROM cliente
 WHERE email LIKE ('%@email.%') AND estado IN ('SP')
 ORDER BY nomeCliente
+
+INSERT INTO tiposervico (nomeservico, valor)
+VALUES 
+('Consulta Padrão',150),
+('Consulta Emergência',250),
+('Exame - Sangue',100),
+('Exame - Ultrassom|Raio X',300),
+('Vacina - Geral',100),
+('Castração',80),
+('Internação',600);
+
+SELECT * FROM tiposervico
+ 
+INSERT INTO animal (idCliente, nomeAnimal, especie, raca, peso, porte, sexo, datadenascimento)
+VALUES
+(1,  'Thor',  'Canino', 'SRD', 12.40, 'M', 'M', 2021),
+(7,  'Maya',  'Felino', 'Siames', 4.20, 'P', 'F', 2023),
+(12, 'Pingo', 'Canino', 'Pinscher', 3.10, 'P', 'M', 2022),
+(18, 'Luna',  'Felino', 'Persa', 3.80, 'P', 'F', 2020),
+(22, 'Zeca',  'Ave',    'Calopsita', 0.09, 'P', 'M', 2024);
+ 
+INSERT INTO veterinario (nomeVeterinario, crmv, especialidade)
+VALUES 
+('Farinhas Breno', 19234511070, 'Vet de Animais Intolerantes Celíacos'),
+('Camila Souza', 20234511111, 'Cirurgiã de Pequenos Animais'),
+('Rafael Nogueira', 18256722222, 'Clínico Geral e Emergencista'),
+('Larissa Almeida', 17287633333, 'Especialista em Felinos'),
+('Pedro Henrique', 16234544444, 'Anestesista Veterinário'),
+('Juliana Ribeiro', 19298755555, 'Dermatologista de Animais Domésticos'),
+('Lucas Fernandes', 15287666666, 'Ortopedista Veterinário'),
+('Ana Beatriz Costa', 14234577777, 'Especialista em Animais Silvestres'),
+('Gabriel Martins', 13287688888, 'Cardiologista Veterinário'),
+('Patrícia Lima', 12234599999, 'Nutricionista Animal');
+ 
+INSERT INTO consulta ( idAnimal, idVeterinario, dataHora, pago, formaPagamento, quantidadeDvezes, valorTotal, valorPago)
+VALUES 
+(1,3, '2025-11-03 18:00', 1, 'cartão de débito', 1, 700.00, 700.00),
+(2,5, '2025-11-04 15:30', 1, 'cartão de crédito', 3, 850.00, 850.00),
+(3,6, '2025-11-05 12:30', 1, 'dinheiro', 1, 750.00, 750.00),
+(4,9, '2025-11-06 11:30', 1, 'dinheiro', 1, 500.00, 500.00),
+(5,2, '2025-11-07 10:30', 1, 'cartão de crédito', 5, 800.00, 800.00);
+ 
+INSERT INTO consulta_tiposervico (idConsulta, idTipoServico, valorServico)
+VALUES
+(11, 7, 600.00),
+(12, 6, 80.00),
+(13, 2, 250.00),
+(14, 5, 100.00),
+(15, 4, 300.00);
+
+SELECT * FROM tiposervico
+SELECT * FROM cliente
+SELECT * FROM consulta_tiposervico
+SELECT * FROM celulares
+SELECT * FROM animal
+
+/*Inserir 2 consultas com 1 procedimento cada para um mesmo animal da clínica, mas em dias diferentes; (2 coins por linha afetada corretamente)*/
+ 
+INSERT INTO consulta (idAnimal, idVeterinario, dataHora, Pago, formaPagamento, quantidadeDvezes, valorTotal, valorPago)
+VALUES
+(1, 2, '2025-11-05 12:30', 1, 'pix', 1, 600.00, 600.00);
+ 
+INSERT INTO consulta (idAnimal, idVeterinario, dataHora, Pago, formaPagamento, quantidadeDvezes, valorTotal, valorPago)
+VALUES 
+(1, 2, '2025-11-06 13:30', 0, 'Dinheiro', 1, 600.00, 0.00);
+ 
+INSERT INTO consulta_tiposervico (idConsulta, idTipoServico, valorServico)
+VALUES 
+(10, 11, 600.00),
+(10, 11, 600.00);
+ 
+/*Inserir 1 cosulta com 2 procedimentos para um mesmo animal da clínica. (2 coins por linha afetada corretamente)*/
+INSERT INTO consulta (idAnimal, idVeterinario, dataHora, Pago, formaPagamento, quantidadeDvezes, valorTotal, valorPago)
+VALUES
+(1, 1, '2025-11-05 12:30', 1, 'pix', 1, 150.00, 150.00),
+(1, 5, '2025-11-05 13:30', 0, 'pix', 1, 600.00, 0.00);
+ 
+INSERT INTO consulta_tiposervico (idConsulta, idTipoServico, valorServico)
+VALUES 
+(13, 1, 150.00),
+(13, 7, 600.00);
+
+
+UPDATE consulta_tiposervico
+SET idConsulta = 18
+WHERE idConsultaTipoServico = 19;
+
+ALTER TABLE veterinario
+ADD CONSTRAINT crmv UNIQUE (crmv);
+
+/*veterinarios (nome,crmv) apenas dos que ja atenderam uma consulta (dataHora)*/
+
+/*INNER JOIN*/
+SELECT nomeVeterinario, crmv, dataHora, valorTotal FROM veterinario
+INNER JOIN consulta
+ON veterinario.idVeterinario = consulta.idVeterinario
+
+/*LEFT JOIN-ordenado por nome, depois pro data-apenas veterinarios com a letra P*/
+SELECT nomeVeterinario, crmv, dataHora, valorTotal FROM veterinario
+LEFT JOIN consulta
+ON veterinario.idVeterinario = consulta.idVeterinario
+WHERE nomeVeterinario LIKE 'P%'
+ORDER BY nomeVeterinario, dataHora ASC 
+
+/*Nome do animal, nome do cliente, contatotos do cliente em ordem alfabetica por nome do animal
+Apenas clientes que moram no estado de SP*/
+
+SELECT nomeAnimal,nomeCliente, email FROM cliente
+INNER JOIN animal
+ON cliente.idCliente = animal.idCliente
+WHERE estado LIKE 'SP'
+ORDER BY nomeAnimal ASC 
+
+
+/*Funções de Agregação*/
+/*Count*/
+SELECT COUNT(idAnimal) AS 'Qtd Animais' FROM animal;
+ 
+/*Max |Min */
+SELECT MAX(idCliente) AS 'Maior ID de Cliente' FROM cliente;
+SELECT MIN(idCliente) AS 'Menor ID de Cliente' FROM cliente;
+SELECT MAX(peso) AS 'Animal mais pesado' FROM animal
+ 
+/*AVG*/
+SELECT AVG(peso) AS 'Média de pesos' FROM animal;
+ 
+/*SUM*/
+SELECT SUM(valorPago) AS 'Rendimento Bruto - R$' FROM consulta;
+
+/*Funções Agregação com GROUP BY*/
+/*Quantidade de clientes por estado*/
+SELECT estado, COUNT(idCliente) AS qtd FROM cliente 
+WHERE estado IN ('SC','PR','RS')
+GROUP BY estado
+ORDER BY estado DESC
+ 
+/* B - Nome do animal, peso, que animal que é, nome do cliente de todos os animais
+
+em ordem alfabética por nome do animal */
+
+SELECT nomeAnimal,peso, especie, nomeCliente FROM animal
+INNER JOIN cliente
+ON animal.idCliente = cliente.idCliente
+ORDER BY nomeAnimal
+ 
+/* C - Nome do procedimento, seu valor, de todos os procedimentos que foram realizados
+
+em alguma consulta, em ordem alfabética por nome do procedimento. Também se requer a data
+
+em que foram realizados os procedimentos.  */
+ 
+SELECT ts.nomeServico, ts.valor, c.dataHora AS data_realizacao
+FROM tipoServico ts
+JOIN consulta_tiposervico ctsc ON ts.idTipoServico = ctsc.idTipoServico
+JOIN consulta c ON ctsc.idConsulta = c.idConsulta
+ORDER BY ts.nomeServico;
+ 
+ 
+/* D - Nome do procedimento, seu valor, de todos os procedimentos cadastrados sejam
+
+realizados ou não em alguma consulta, em ordem alfabética por nome do procedimento. 
+
+Também se requer a data em que foram realizados os procedimentos.*/
+
+
+SELECT nomeServico,valor,dataHora
+FROM tipoServico 
+LEFT JOIN consulta_tiposervico ON tipoServico.idTipoServico = consulta_tiposervico.idTipoServico
+LEFT JOIN Consulta ON consulta_tiposervico.idConsulta = consulta.idConsulta
+ORDER BY nomeServico;
+
+ 
+/* E - Nome do cliente, cpf, cidade, estado de todos os clientes
+
+que vivem na região sudeste em ordem alfabética por nome e cidade. */
+
+SELECT nomecliente,cpf,cidade,estado FROM cliente
+WHERE estado IN ('sp','es','rj','mg');
+ 
+/*A gente já fez a A
+ 
+e a segunda parte:
+ 
+/*Todos os animais e a quantidade de espécies*/
+
+SELECT especie, COUNT(*) AS quantidade
+FROM animal
+GROUP BY especie;
+ 
+/*Todos os animais e a quantidade de espécies, mas apenas dos animais que possuem 
+
+mais de 3 espécies*/
+
+SELECT especie, COUNT(especie) AS quantidade_especies
+FROM animal
+GROUP BY especie
+HAVING COUNT(especie) >= 2;
+
+

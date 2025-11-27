@@ -292,7 +292,7 @@ WHERE nomeCliente LIKE 'A%'
 
 /*18)Listar todos os dados dos clientes que começam com a letra M e vivam no estado de PE.*/
 
-SELECT * FROM cliente 
+SELECT * FROM cliente
 WHERE nomeCliente LIKE 'M%' AND estado = 'PE'
 
 /*19)Listar apenas as cadeiras e a quantidade que possui em estoque em ordem de quantidade, da que mais possui itens para a que menos possui. */
@@ -304,6 +304,119 @@ ORDER BY qtd DESC;
 
 /*20)Listar todos os dados dos alugueis que ocorreram entre 25/12 e 31/12 de 2024 em ordem de data da mais antiga para a mais nova. */
 
-SELECT * FROM aluguel 
-WHERE dataHoraRetirada BETWEEN '2024-12-25%' AND '2024-12-31%'
+SELECT * FROM equipamento
+WHERE dataHoraRetirada BETWEEN '2024-12-25' AND '2024-12-31'
 ORDER BY dataHoraRetirada ASC;
+
+
+ALTER TABLE Equipamento
+ADD CONSTRAINT uq_nomeEquipamento UNIQUE (nomeEquipamento);
+
+ALTER TABLE Aluguel
+ALTER COLUMN qtVezes SET DEFAULT 1;
+
+SELECT * FROM aluguel
+
+
+/* nome do equipamento, valor aluguel,qual funcionario alugou,ordem alfabetica*/
+
+SELECT nomeEquipamento,
+
+/* nome do cliente,funcionario que atendeu e oq ele alugou */
+
+UPDATE equipamento
+SET valorHora = 50
+
+
+
+UPDATE aluguel
+SET formaPagamento = 'cartão'
+WHERE DATE(dataHoraRetirada) BETWEEN '2024-12-25' AND '2025-01-01';
+
+
+/*1.Criar um aluguel de equipamento para o mês de novembro (qualquer data e hora), qualquer equipamento, qualquer funcionário e qualquer cliente, mas cujo pagamento não tenha sido feito (ficou em aberto).
+2.Listar nome de todos os funcionários, cpf e os aluguéis feitos por ele (apenas a data e que equipamento alugou). 
+3.Listar nome do cliente, cpf, datas que ele esteve na praia, quem atendeu este
+cliente, tudo isto, ordenado por data, da mais nova para a mais antiga, apenas no mês de DEZ24.  
+4.Lista do nome dos equipamentos que foram mais alugados em ordem decrescente, do equipamento mais alugado para o menos alugado. Equipamentos não alugados devem sair no relatório. 
+5.Listar a arrecadação bruta da barraca de praia entre Natal e Ano Novo.
+6.Reajustar preço por hora de todos os equipamentos em 10%.
+7.Listar a quantidade de clientes que pagaram utilizando determinada forma de pagamento, em ordem crescente, do método mais usado para o menos usado. Também é necessário que pagamentos não realizados sejam apontados. 
+8.Listar quanto a barraca faturou por dia, em cada um dos dias do mês de dezembro apenas. 
+9.Excluir o pagamento e todas as referências a ele criadas no item 1. Se tentar excluir direto da tabela aluguel teremos um problema? Por que isto ocorre? Como resolver (escrever o código usado)?
+10.Listar todos os equipamentos que tiveram a quantidade de aluguéis inferiores a 5 unidades, durante o mês de DEZ24.*/
+
+INSERT INTO Aluguel (idCliente,idFuncionario,dataHoraRetirada,dataHoraDevolucao,pago,formaPagamento,qtVezes)
+VALUES 
+(69, 1, '2024-11-11 09:00:00', (NULL), 0, (NULL),(NULL))
+
+INSERT INTO aluguelequipamento (idAluguel, idEquipamento, quantidade, valorUnitario, valorItem)
+VALUES (LAST_INSERT_ID(),
+(SELECT idEquipamento FROM equipamento WHERE nomeEquipamento = 'mesinha'),1,1.50,(1.50*1)
+);
+UPDATE equipamento
+SET qtd = qtd - 1
+WHERE nomeEquipamento = 'Mesinha'
+
+
+SELECT funcionario.nomeFuncionario,funcionario.cpf,aluguel.dataHoraRetirada,equipamento.nomeEquipamento
+FROM funcionario
+INNER JOIN aluguel
+ON aluguel.idFuncionario = funcionario.idFuncionario
+INNER JOIN aluguelequipamento
+ON aluguelequipamento.idAluguel = aluguel.idAluguel
+INNER JOIN equipamento
+ON equipamento.idEquipamento = aluguelequipamento.idEquipamento;
+
+SELECT cliente.nomeCliente,cliente.cpf,aluguel.dataHoraRetirada,funcionario.nomeFuncionario
+FROM cliente
+INNER JOIN aluguel
+ON aluguel.idCliente = cliente.idCliente
+INNER JOIN funcionario
+ON aluguel.idFuncionario = funcionario.idFuncionario
+WHERE MONTH(aluguel.dataHoraRetirada) = 12
+  AND YEAR(aluguel.dataHoraRetirada) = 2024
+ORDER BY aluguel.dataHoraRetirada DESC;
+
+
+SELECT equipamento.nomeEquipamento,COUNT(aluguelequipamento.idEquipamento) AS totalAlugado
+FROM equipamento
+LEFT JOIN aluguelequipamento
+ON equipamento.idEquipamento = aluguelequipamento.idEquipamento
+LEFT JOIN aluguel
+ON aluguel.idAluguel = aluguelequipamento.idAluguel
+GROUP BY equipamento.idEquipamento, equipamento.nomeEquipamento
+ORDER BY totalAlugado DESC;
+
+SELECT sum(valorAPagar) AS ArrecadacaoBruta
+FROM aluguel
+WHERE DATE(dataHoraRetirada) BETWEEN '2024-12-25' AND '2025-01-01';
+
+
+UPDATE equipamento
+SET valorHora = valorHora *1.10
+
+SELECT COALESCE(formaPagamento, 'Não pago') AS FormaDePagamento,COUNT(*) AS Quantidade
+FROM aluguel
+GROUP BY formaPagamento
+ORDER BY Quantidade ASC;
+
+
+SELECT DATE(dataHoraRetirada) AS Dia,SUM(valorAPagar) AS FaturamentoDiario
+FROM aluguel
+WHERE MONTH(dataHoraRetirada) = 12
+GROUP BY DATE(dataHoraRetirada)
+ORDER BY Dia;
+
+/* Não da para excluir por causa da chave estrangeira, para excluir tem que retirar todas as chaves que ele esta*/
+
+SELECT equipamento.idEquipamento,equipamento.nomeEquipamento,COUNT(aluguelequipamento.idEquipamento) AS totalAlugueis
+FROM equipamento
+LEFT JOIN aluguelequipamento
+ON equipamento.idEquipamento = aluguelequipamento.idEquipamento
+LEFT JOIN aluguel
+ON aluguel.idAluguel = aluguelequipamento.idAluguel
+WHERE MONTH(aluguel.dataHoraRetirada) = 12
+AND YEAR(aluguel.dataHoraRetirada) = 2024
+GROUP BY equipamento.idEquipamento, equipamento.nomeEquipamento
+HAVING COUNT(aluguelequipamento.idEquipamento) < 5;
